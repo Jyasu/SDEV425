@@ -213,5 +213,4 @@ public class Authenticate extends HttpServlet {
         }
         return status;
     }
-
 }
