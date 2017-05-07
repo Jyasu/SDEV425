@@ -13,9 +13,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -147,19 +146,21 @@ public class Authenticate extends HttpServlet {
     }// </editor-fold>
 
     // Method to Authenticate
-    public boolean validate(String name, String pass) {
+    public boolean validate(String name, String pass) throws IOException {
+        URL path = Authenticate.class.getResource("login.txt");
+
         boolean status = false;
         int hitcnt=0;
         setAttempts(this.attempts+1);
         System.out.println(this.attempts+" login attempts made");
-        if(this.attempts > 3){
-            waitUntil = System.currentTimeMillis() + 3 * 60 * 1000;
-            System.out.println("Account locked for "+ TimeUnit.MILLISECONDS.toMinutes(waitUntil - System.currentTimeMillis())+" minutes.");
+        if(this.attempts > 3){            
+            waitUntil = System.currentTimeMillis() + 30 * 60 * 1000;
+            System.out.println("Account locked for "+ TimeUnit.MILLISECONDS.toMinutes(waitUntil - System.currentTimeMillis())+" minutes.\n");
             return false;
         }
         
         try {
-            URL path = ShowAccount.class.getResource("login.txt");
+            path = Authenticate.class.getResource("login.txt");
             File f = new File(path.getFile());
             BufferedReader reader = new BufferedReader(new FileReader(f));
             String key = reader.readLine();
@@ -179,16 +180,19 @@ public class Authenticate extends HttpServlet {
             //a user logs in they can successfully login without a username value
             user_id = 0;
 
-            Statement stmt = conn.createStatement();
-            String sql = "select user_id from sdev_users  where email = '" + this.username + "'";
-            ResultSet rs = stmt.executeQuery(sql);
+            String sql = "select user_id from sdev_users where email = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setString(1, this.username);
+            ResultSet rs = pstmt.executeQuery();
             while (rs.next()) {
                 user_id = rs.getInt(1);
             }
-            if (user_id > 0) {                
-                String sql2 = "select password from user_info where user_id = " + user_id + " ";
-                //String sq12 = "select password from user_info where user_id = " + user_id + "'";
-                ResultSet rs2 = stmt.executeQuery(sql2);
+            if (user_id > 0) {
+                String sql2 = "select password from user_info where user_id = ?";
+                PreparedStatement stmt = conn.prepareStatement(sql2);             
+                stmt = conn.prepareStatement(sql2);
+                stmt.setString(1, Integer.toString(user_id));
+                ResultSet rs2 = stmt.executeQuery();
                 boolean matched;
                 
                 while (rs2.next()) {
