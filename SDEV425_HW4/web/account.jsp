@@ -31,10 +31,7 @@
             <% String CardType = (String) request.getAttribute("CardType");%>  
             <% String ServiceCode = (String) request.getAttribute("ServiceCode");%>  
             <% String CardNumber = (String) request.getAttribute("CardNumber");%>  
-            <% String CAV_CCV2 = (String) request.getAttribute("CAV_CCV2").toString();%> 
             <% String expiredate = (String) request.getAttribute("expiredate").toString();%> 
-            <% String FullTrackData = (String) request.getAttribute("FullTrackData");%> 
-            <% String PIN = (String) request.getAttribute("PIN");%> 
           
             <form action="ContinueIt" method="post">
                 <table class="center">
@@ -43,9 +40,6 @@
                     <td><input type="text"  name="emailAddress"  value="<%= UserEmail%>" size="50" readOnly> </td>
                     </tr>
                     <tr>
-                     <td> User ID: </td>
-                     <td><input type="text" name="userid" value="<%= user_id%>" size="50" readOnly></td>
-                    </tr>
                     <tr>
                      <td> Card Holder Name: </td>
                      <td><input type="text" name="cardholdername" value="<%= Cardholdername%>" size="50" readOnly></td>
@@ -63,22 +57,10 @@
                      <td> Card Number: </td>
                      <td><input type="text" name="cardnumber" value="<%= CardNumber%>" size="50" readOnly></td>
                     </tr>
-                    <tr>
-                     <td> CAV CCV2: </td>
-                     <td><input type="text" name="cavccv2" value="<%= CAV_CCV2%>" size="50" readOnly></td>
-                    </tr>
                      <tr>
                      <td> Expire Date: </td>
                      <td><input type="text" name="expiredate" value="<%= expiredate%>" size="50" readOnly></td>
-                    </tr>
-                     <tr>
-                     <td> Full Track Data: </td>
-                     <td><input type="text" name="fulltrackdata" value="<%= FullTrackData%>" size="50" readOnly></td>
-                    </tr>
-                     <tr>
-                     <td> PIN: </td>
-                     <td><input type="text" name="pin" value="<%= PIN%>" size="50" readOnly></td>
-                    </tr>                    
+                    </tr>                   
                 </table>
             </form>
             <% }%>

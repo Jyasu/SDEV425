@@ -3,6 +3,9 @@
     Created on : Nov 7, 2015, 10:39:39 AM
     Author     : jim
 --%>
+<%-- Invalidate Session --%>
+<% session.invalidate();%>
+
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -17,9 +20,7 @@
          <%@include file="WEB-INF/jspf/menus.jspf" %>
             <p></p>
             <p></p>
-        <%-- Invalidate Session --%>
-        <% session.invalidate();
-        %>
+
         <h2>Thank you for visiting our Web Site.</h2>
         </div>
     </body>
