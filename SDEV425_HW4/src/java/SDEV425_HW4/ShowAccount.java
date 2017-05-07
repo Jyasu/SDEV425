@@ -20,11 +20,9 @@ import javax.servlet.http.HttpSession;
 // DB resources
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Scanner;
 import javax.servlet.RequestDispatcher;
-import static javax.servlet.SessionTrackingMode.URL;
 import org.apache.derby.jdbc.ClientDataSource;
 
 /**
@@ -136,12 +134,13 @@ public class ShowAccount extends HttpServlet {
             ds.setDataSourceName("jdbc:derby");
 
             Connection conn = ds.getConnection();
-
-            Statement stmt = conn.createStatement();
             String sql = "select user_id,Cardholdername, Cardtype,"
                     + "ServiceCode, CardNumber,expiredate"
-                    + " from customeraccount where user_id = " + session.getAttribute("UMUCUserID");
-            ResultSet rs = stmt.executeQuery(sql);
+                    + " from customeraccount where user_id = ?";
+            PreparedStatement pstmt = conn.prepareStatement(sql);
+            pstmt.setObject(1, session.getAttribute("UMUCUserID"));
+            ResultSet rs = pstmt.executeQuery();
+
             path = ShowAccount.class.getResource("key.txt");
             f = new File(path.getFile());
             reader = new BufferedReader(new FileReader(f));
@@ -165,6 +164,4 @@ public class ShowAccount extends HttpServlet {
         String lastFour = "**** **** **** "+creditCard.substring(creditCard.length()-4);
         return lastFour;
     }
-    
-
 }
