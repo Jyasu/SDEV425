@@ -28,11 +28,11 @@
             <form action="Authenticate" method="post">
                 <table class="center">
                     <tr>
-                    <td>Email: </td><td><input type="text"  name="emailAddress"  size="50" autofocus> </td>
+                    <td>Email: </td><td><input type="text"  name="emailAddress"  size="50" maxlength="50" autofocus> </td>
                     </tr>
                     <tr>
                         <td>
-                            Password: </td><td><input type="password" name="pfield" size="50" autocomplete="off"></td>
+                            Password: </td><td><input type="password" name="pfield" size="50" maxlength="50" autocomplete="off"></td>
                     </tr>
                     <tr>
                         <td>

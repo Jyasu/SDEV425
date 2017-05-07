@@ -5,8 +5,12 @@
  */
 package SDEV425_HW4;
 
+import static SDEV425_HW4.AES.decrypt;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.net.URL;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +22,9 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Scanner;
 import javax.servlet.RequestDispatcher;
+import static javax.servlet.SessionTrackingMode.URL;
 import org.apache.derby.jdbc.ClientDataSource;
 
 /**
@@ -35,10 +41,7 @@ public class ShowAccount extends HttpServlet {
     private String CardType;
     private String ServiceCode;
     private String CardNumber;
-    private int CAV_CCV2;
     private Date expiredate;
-    private String FullTrackData;
-    private String PIN;
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -66,10 +69,7 @@ public class ShowAccount extends HttpServlet {
             request.setAttribute("CardType", CardType);
             request.setAttribute("ServiceCode", ServiceCode);
             request.setAttribute("CardNumber", CardNumber);
-            request.setAttribute("CAV_CCV2", CAV_CCV2);
             request.setAttribute("expiredate", expiredate);
-            request.setAttribute("FullTrackData", FullTrackData);
-            request.setAttribute("PIN", PIN);
             
             RequestDispatcher dispatcher = request.getRequestDispatcher("account.jsp");
             dispatcher.forward(request, response);       
@@ -121,32 +121,39 @@ public class ShowAccount extends HttpServlet {
     public void getData() {
 
         try {
+            URL path = ShowAccount.class.getResource("login.txt");
+            File f = new File(path.getFile());
+            BufferedReader reader = new BufferedReader(new FileReader(f));
+            String keydb = reader.readLine();
+            String info = reader.readLine();
+            
             ClientDataSource ds = new ClientDataSource();
-            ds.setDatabaseName("SDEV425");
+            ds.setDatabaseName(decrypt(info, keydb));
             ds.setServerName("localhost");
             ds.setPortNumber(1527);
-            ds.setUser("sdev425");
-            ds.setPassword("sdev425");
+            ds.setUser(decrypt(info, keydb));
+            ds.setPassword(decrypt(info, keydb));
             ds.setDataSourceName("jdbc:derby");
 
             Connection conn = ds.getConnection();
 
             Statement stmt = conn.createStatement();
             String sql = "select user_id,Cardholdername, Cardtype,"
-                    + "ServiceCode, CardNumber,CAV_CCV2,expiredate,FullTrackData,PIN"
-                    + " from customeraccount  where user_id = " + session.getAttribute("UMUCUserID");
+                    + "ServiceCode, CardNumber,expiredate"
+                    + " from customeraccount where user_id = " + session.getAttribute("UMUCUserID");
             ResultSet rs = stmt.executeQuery(sql);
+            path = ShowAccount.class.getResource("key.txt");
+            f = new File(path.getFile());
+            reader = new BufferedReader(new FileReader(f));
+            String key = reader.readLine();
             // Assign values
             while (rs.next()) {
                 user_id = rs.getInt(1);
                 Cardholdername = rs.getString(2);
                 CardType = rs.getString(3);
-                ServiceCode = rs.getString(4);
-                CardNumber = rs.getString(5);
-                CAV_CCV2 = rs.getInt(6);
-                expiredate = rs.getDate(7);
-                FullTrackData = rs.getString(8);
-                PIN = rs.getString(9);
+                ServiceCode = decrypt(rs.getString(4),key);
+                CardNumber = obscureCC(decrypt(rs.getString(5), key));
+                expiredate = rs.getDate(6);
             }
 
         } catch (Exception e) {
@@ -154,5 +161,10 @@ public class ShowAccount extends HttpServlet {
         }
 
     }
+    public String obscureCC(String creditCard){
+        String lastFour = "**** **** **** "+creditCard.substring(creditCard.length()-4);
+        return lastFour;
+    }
+    
 
 }
